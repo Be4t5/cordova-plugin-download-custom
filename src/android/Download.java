@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.zxt.download2;
+import com.zxt.download2.*;
 
 
 public class Download extends CordovaPlugin {
