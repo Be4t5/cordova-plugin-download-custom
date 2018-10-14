@@ -14,10 +14,10 @@ public class Download extends CordovaPlugin {
 
         if (action.equals("download")) {
 
-            String url = args.getString(0);
-            String path = args.getString(1);
-            String fileName = args.getString(2);
-            String title = args.getString(3);
+            String url = data.getString(0);
+            String path = data.getString(1);
+            String fileName = data.getString(2);
+            String title = data.getString(3);
 			
 			DownloadTask downloadTask4 = new DownloadTask(url, path, fileName, title, null);
             //downloadTask4.setThumbnail("file:///sdcard/hobbit.jpg"); //use image file uri
