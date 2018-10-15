@@ -9,10 +9,14 @@ import android.net.Uri;
 
 
 public class Download extends CordovaPlugin {
-		
+	
+	CallbackContext callbackContext1;
+	
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
-
+	
+		callbackContext1 = callbackContext;
+		
         if (action.equals("download")) {
 
             String url = data.getString(0);
