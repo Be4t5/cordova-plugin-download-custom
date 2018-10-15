@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.mindorks.android.*;
+import com.tonyodev.fetch2.*;
 
 
 public class Download extends CordovaPlugin {
@@ -19,45 +19,25 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
-			PRDownloader.initialize(this.cordova.getActivity().getApplicationContext());
-			
-			int downloadId = PRDownloader.download(url, path, fileName)
-                        .build()
-                        .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                            @Override
-                            public void onStartOrResume() {
-                               
-                            }
-                        })
-                        .setOnPauseListener(new OnPauseListener() {
-                            @Override
-                            public void onPause() {
-                               
-                            }
-                        })
-                        .setOnCancelListener(new OnCancelListener() {
-                            @Override
-                            public void onCancel() {
-                                
-                            }
-                        })
-                        .setOnProgressListener(new OnProgressListener() {
-                            @Override
-                            public void onProgress(Progress progress) {
-                               
-                            }
-                        })
-                        .start(new OnDownloadListener() {
-                            @Override
-                            public void onDownloadComplete() {
-                               
-                            }
+			FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
+                .setDownloadConcurrentLimit(3)
+                .build();
 
-                            @Override
-                            public void onError(Error error) {
-                               
-                            }
-                        });            
+			fetch = Fetch.Impl.getInstance(fetchConfiguration);
+
+			String file = path + fileName;
+			
+			final Request request = new Request(url, file);
+			request.setPriority(Priority.HIGH);
+			request.setNetworkType(NetworkType.ALL);
+			
+			fetch.enqueue(request, updatedRequest -> {
+				//Request was successfully enqueued for download.
+				callbackContext.success("ok");
+			}, error -> {
+				//An error occurred enqueuing the request.
+				callbackContext.success("no");
+			});
 			
             callbackContext.success("ok");
 
