@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import com.thin.downloadmanager.*;
+import android.net.Uri;
 
 
 public class Download extends CordovaPlugin {
