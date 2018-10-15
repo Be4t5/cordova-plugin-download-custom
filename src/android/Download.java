@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.zxt.download2.*;
+import com.mindorks.android.*;
 
 
 public class Download extends CordovaPlugin {
@@ -19,11 +19,45 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
-			DownloadTask downloadTask4 = new DownloadTask(url, path, fileName, title, null);
-            //downloadTask4.setThumbnail("file:///sdcard/hobbit.jpg"); //use image file uri
-            DownloadTaskManager.getInstance(cordova.getActivity()).registerListener(downloadTask4,
-                    new DownloadNotificationListener(cordova.getActivity().getApplicationContext(), downloadTask4));
-            DownloadTaskManager.getInstance(cordova.getActivity()).startDownload(downloadTask4);
+			PRDownloader.initialize(this.cordova.getActivity().getApplicationContext());
+			
+			int downloadId = PRDownloader.download(url, path, fileName)
+                        .build()
+                        .setOnStartOrResumeListener(new OnStartOrResumeListener() {
+                            @Override
+                            public void onStartOrResume() {
+                               
+                            }
+                        })
+                        .setOnPauseListener(new OnPauseListener() {
+                            @Override
+                            public void onPause() {
+                               
+                            }
+                        })
+                        .setOnCancelListener(new OnCancelListener() {
+                            @Override
+                            public void onCancel() {
+                                
+                            }
+                        })
+                        .setOnProgressListener(new OnProgressListener() {
+                            @Override
+                            public void onProgress(Progress progress) {
+                               
+                            }
+                        })
+                        .start(new OnDownloadListener() {
+                            @Override
+                            public void onDownloadComplete() {
+                               
+                            }
+
+                            @Override
+                            public void onError(Error error) {
+                               
+                            }
+                        });            
 			
             callbackContext.success("ok");
 

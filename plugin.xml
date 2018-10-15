@@ -24,8 +24,7 @@
     </config-file>
 
     <source-file src="src/android/Download.java" target-dir="src/com/download/"/>
-	<source-file src="src/android/libs/download.jar" target-dir="libs" />
-<!-- <framework src="com.tonyodev.fetch2:fetch2:2.2.0-RC14" /> -->
+<framework src="com.tonyodev.fetch2:fetch2:2.2.0-RC14" />
 
   </platform>
 
