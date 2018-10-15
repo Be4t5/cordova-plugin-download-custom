@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.tonyodev.fetch2.*;
+import com.zxt.download2.*;
 
 
 public class Download extends CordovaPlugin {
@@ -19,25 +19,11 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
-			FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
-                .setDownloadConcurrentLimit(3)
-                .build();
-
-			fetch = Fetch.Impl.getInstance(fetchConfiguration);
-
-			String file = path + fileName;
-			
-			final Request request = new Request(url, file);
-			request.setPriority(Priority.HIGH);
-			request.setNetworkType(NetworkType.ALL);
-			
-			fetch.enqueue(request, updatedRequest -> {
-				//Request was successfully enqueued for download.
-				callbackContext.success("ok");
-			}, error -> {
-				//An error occurred enqueuing the request.
-				callbackContext.success("no");
-			});
+			DownloadTask downloadTask4 = new DownloadTask(url, path, fileName, title, null);
+            //downloadTask4.setThumbnail("file:///sdcard/hobbit.jpg"); //use image file uri
+            DownloadTaskManager.getInstance(cordova.getActivity()).registerListener(downloadTask4,
+                    new DownloadNotificationListener(cordova.getActivity().getApplicationContext(), downloadTask4));
+            DownloadTaskManager.getInstance(cordova.getActivity()).startDownload(downloadTask4);
 			
             callbackContext.success("ok");
 
