@@ -20,6 +20,8 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
+			ThinDownloadManager downloadManager = new ThinDownloadManager(4);
+			
 			Uri downloadUri = Uri.parse(url);
 		   Uri destinationUri = Uri.parse(path+fileName);
 		   DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
