@@ -36,7 +36,7 @@ public class Download extends CordovaPlugin {
 					   }
 
 					   @Override
-					   public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress)) {
+					   public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress) {
 							callbackContext.success(progress);
 					   }
 				   });
