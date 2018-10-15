@@ -42,7 +42,7 @@ public class Download extends CordovaPlugin {
 					   }
 				   });
 			
-			int downloadId = downloadManager.add(downloadRequest);
+			downloadManager.add(downloadRequest);
 
             return true;
 
