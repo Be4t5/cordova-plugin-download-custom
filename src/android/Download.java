@@ -34,17 +34,17 @@ public class Download extends CordovaPlugin {
 				   .setDownloadListener(new DownloadStatusListener() {
 					   @Override
 					   public void onDownloadComplete(int id) {
-							callbackContext.success("ok");
+							callbackContext1.success("ok");
 					   }
 
 					   @Override
 					   public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-							callbackContext.success("ok");
+							callbackContext1.success("ok");
 					   }
 
 					   @Override
 					   public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress) {
-							callbackContext.success(progress);
+							callbackContext1.success(progress);
 					   }
 				   });
 			
