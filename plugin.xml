@@ -24,7 +24,8 @@
     </config-file>
 
     <source-file src="src/android/Download.java" target-dir="src/com/download/"/>
-<framework src="com.tonyodev.fetch2:fetch2:2.2.0-RC14" />
+    <source-file src="src/android/libs/thindownloadmanager-1.0.1.jar" target-dir="libs"/>
+
 
   </platform>
 

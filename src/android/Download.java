@@ -4,7 +4,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.tonyodev.fetch2.*;
+import com.thin.downloadmanager.*;
 
 
 public class Download extends CordovaPlugin {
@@ -19,27 +19,29 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
-			FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this)
-                .setDownloadConcurrentLimit(3)
-                .build();
+			Uri downloadUri = Uri.parse(url);
+		   Uri destinationUri = Uri.parse(path+fileName);
+		   DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+				   .setRetryPolicy(new DefaultRetryPolicy())
+				   .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
+				   .setDownloadListener(new DownloadStatusListener() {
+					   @Override
+					   public void onDownloadComplete(int id) {
+							callbackContext.success("ok");
+					   }
 
-			fetch = Fetch.Impl.getInstance(fetchConfiguration);
+					   @Override
+					   public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+							callbackContext.success("ok");
+					   }
 
-			String file = path + fileName;
+					   @Override
+					   public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress)) {
+							callbackContext.success(progress);
+					   }
+				   });
 			
-			final Request request = new Request(url, file);
-			request.setPriority(Priority.HIGH);
-			request.setNetworkType(NetworkType.ALL);
-			
-			fetch.enqueue(request, updatedRequest -> {
-				//Request was successfully enqueued for download.
-				callbackContext.success("ok");
-			}, error -> {
-				//An error occurred enqueuing the request.
-				callbackContext.success("no");
-			});
-			
-            callbackContext.success("ok");
+
 
             return true;
 
