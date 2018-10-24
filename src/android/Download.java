@@ -27,6 +27,7 @@ import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.liulishuo.okdownload.*;
 
 
+
 public class Download extends CordovaPlugin {
 	
 	CallbackContext callbackContext1;
@@ -61,6 +62,12 @@ public class Download extends CordovaPlugin {
 					//statusTv.setText(R.string.task_start);
 				}
 
+				@Override
+				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
+									  boolean fromBreakpoint,
+									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
+
+				}
 
 				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
 												   @NonNull Map<String, List<String>> requestHeaders) {
