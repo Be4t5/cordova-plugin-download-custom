@@ -3,9 +3,9 @@ package com.download;
 import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
+import java.io.File;
 
-import com.thin.downloadmanager.*;
-import android.net.Uri;
+import com.liulishuo.okdownload.*;
 
 
 public class Download extends CordovaPlugin {
@@ -24,6 +24,89 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			
+			final File parentFile = new File(path);
+			task = new DownloadTask.Builder(url, parentFile)
+                .setFilename(fileName)
+                // the minimal interval millisecond for callback progress
+                .setMinIntervalMillisCallbackProcess(16)
+                // ignore the same task has already completed in the past.
+                .setPassIfAlreadyCompleted(false)
+                .build();
+				
+			
+			task.enqueue(new DownloadListener4WithSpeed() {
+				private long totalLength;
+				private String readableTotalLength;
+
+				@Override public void taskStart(@NonNull DownloadTask task) {
+					//statusTv.setText(R.string.task_start);
+				}
+
+				@Override
+				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
+									  boolean fromBreakpoint,
+									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
+					statusTv.setText(R.string.info_ready);
+
+					totalLength = info.getTotalLength();
+					readableTotalLength = Util.humanReadableBytes(totalLength, true);
+					//DemoUtil.calcProgressToView(progressBar, info.getTotalOffset(), totalLength);
+				}
+
+				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
+												   @NonNull Map<String, List<String>> requestHeaders) {
+					final String status = "Connect Start " + blockIndex;
+					//statusTv.setText(status);
+				}
+
+				@Override
+				public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode,
+									   @NonNull Map<String, List<String>> responseHeaders) {
+					final String status = "Connect End " + blockIndex;
+					//statusTv.setText(status);
+				}
+
+				@Override
+				public void progressBlock(@NonNull DownloadTask task, int blockIndex,
+										  long currentBlockOffset,
+										  @NonNull SpeedCalculator blockSpeed) {
+				}
+
+				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
+											   @NonNull SpeedCalculator taskSpeed) {
+					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
+					final String progressStatus = readableOffset + "/" + readableTotalLength;
+					final String speed = taskSpeed.speed();
+					final String progressStatusWithSpeed = progressStatus + "(" + speed + ")";
+					
+					//statusTv.setText(progressStatusWithSpeed);
+					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
+				}
+
+				@Override
+				public void blockEnd(@NonNull DownloadTask task, int blockIndex, BlockInfo info,
+									 @NonNull SpeedCalculator blockSpeed) {
+				}
+
+				@Override public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause,
+											  @Nullable Exception realCause,
+											  @NonNull SpeedCalculator taskSpeed) {
+					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
+					//statusTv.setText(statusWithSpeed);
+
+					//actionTv.setText(R.string.start);
+					// mark
+					// task.setTag(null);
+					// if (cause == EndCause.COMPLETED) {
+						// final String realMd5 = fileToMD5(task.getFile().getAbsolutePath());
+						// if (!realMd5.equalsIgnoreCase("f836a37a5eee5dec0611ce15a76e8fd5")) {
+							// Log.e(TAG, "file is wrong because of md5 is wrong " + realMd5);
+						// }
+					// }
+				}
+			});
+			
+			/*
 			ThinDownloadManager downloadManager = new ThinDownloadManager(4);
 			
 			Uri downloadUri = Uri.parse(url);
@@ -49,6 +132,8 @@ public class Download extends CordovaPlugin {
 				   });
 			
 			downloadManager.add(downloadRequest);
+			
+			*/
 
             return true;
 
