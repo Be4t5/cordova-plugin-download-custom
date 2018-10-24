@@ -25,7 +25,7 @@ public class Download extends CordovaPlugin {
             String title = data.getString(3);
 			
 			final File parentFile = new File(path);
-			task = new DownloadTask.Builder(url, parentFile)
+			DownloadTask task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
                 .setMinIntervalMillisCallbackProcess(16)
