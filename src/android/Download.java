@@ -5,7 +5,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 
+import com.liulishuo.okdownload.DownloadTask;
+import com.liulishuo.okdownload.SpeedCalculator;
+import com.liulishuo.okdownload.StatusUtil;
+import com.liulishuo.okdownload.core.Util;
+import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
+import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
+import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
+import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.liulishuo.okdownload.*;
 
 
@@ -43,16 +51,6 @@ public class Download extends CordovaPlugin {
 					//statusTv.setText(R.string.task_start);
 				}
 
-				@Override
-				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
-									  boolean fromBreakpoint,
-									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
-					//statusTv.setText(R.string.info_ready);
-
-					totalLength = info.getTotalLength();
-					//readableTotalLength = Util.humanReadableBytes(totalLength, true);
-					//DemoUtil.calcProgressToView(progressBar, info.getTotalOffset(), totalLength);
-				}
 
 				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
 												   @NonNull Map<String, List<String>> requestHeaders) {
