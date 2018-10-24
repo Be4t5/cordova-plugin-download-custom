@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import android.support.annotation.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.SpeedCalculator;
