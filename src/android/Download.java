@@ -5,17 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 
-import com.liulishuo.okdownload.DownloadTask;
-import com.liulishuo.okdownload.SpeedCalculator;
-import com.liulishuo.okdownload.StatusUtil;
-import com.liulishuo.okdownload.core.Util;
-import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
-import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
-import com.liulishuo.okdownload.core.cause.EndCause;
-import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
-import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
-import com.liulishuo.okdownload.sample.base.BaseSampleActivity;
-import com.liulishuo.okdownload.sample.util.DemoUtil;
+import com.liulishuo.okdownload.*;
 
 
 public class Download extends CordovaPlugin {
@@ -56,10 +46,10 @@ public class Download extends CordovaPlugin {
 				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
 									  boolean fromBreakpoint,
 									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
-					statusTv.setText(R.string.info_ready);
+					//statusTv.setText(R.string.info_ready);
 
 					totalLength = info.getTotalLength();
-					readableTotalLength = Util.humanReadableBytes(totalLength, true);
+					//readableTotalLength = Util.humanReadableBytes(totalLength, true);
 					//DemoUtil.calcProgressToView(progressBar, info.getTotalOffset(), totalLength);
 				}
 
@@ -84,10 +74,10 @@ public class Download extends CordovaPlugin {
 
 				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
 											   @NonNull SpeedCalculator taskSpeed) {
-					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
-					final String progressStatus = readableOffset + "/" + readableTotalLength;
-					final String speed = taskSpeed.speed();
-					final String progressStatusWithSpeed = progressStatus + "(" + speed + ")";
+					//final String readableOffset = Util.humanReadableBytes(currentOffset, true);
+					//final String progressStatus = readableOffset + "/" + readableTotalLength;
+					//final String speed = taskSpeed.speed();
+					//final String progressStatusWithSpeed = progressStatus + "(" + speed + ")";
 					
 					//statusTv.setText(progressStatusWithSpeed);
 					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
