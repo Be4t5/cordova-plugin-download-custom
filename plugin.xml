@@ -29,6 +29,7 @@
 <framework src="com.liulishuo.okdownload:okhttp:1.0.4" />
 <framework src="com.liulishuo.okdownload:okdownload:1.0.4" />
 <framework src="com.liulishuo.okdownload:sqlite:1.0.4" />
+<framework src="com.google.code.findbugs:annotations:3.0.1" />
 
   </platform>
 
