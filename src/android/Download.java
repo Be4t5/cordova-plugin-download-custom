@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 
+import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.*;
 
 
