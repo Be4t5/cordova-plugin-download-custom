@@ -5,7 +5,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 
-import com.liulishuo.okdownload.*;
+import com.liulishuo.okdownload.DownloadTask;
+import com.liulishuo.okdownload.SpeedCalculator;
+import com.liulishuo.okdownload.StatusUtil;
+import com.liulishuo.okdownload.core.Util;
+import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
+import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
+import com.liulishuo.okdownload.core.cause.EndCause;
+import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
+import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
+import com.liulishuo.okdownload.sample.base.BaseSampleActivity;
+import com.liulishuo.okdownload.sample.util.DemoUtil;
 
 
 public class Download extends CordovaPlugin {
