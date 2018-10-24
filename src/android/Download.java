@@ -69,8 +69,9 @@ public class Download extends CordovaPlugin {
 					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
 				}
 
+
 			});
-			callbackContext1.success('ok');
+			
 			/*
 			ThinDownloadManager downloadManager = new ThinDownloadManager(4);
 			
