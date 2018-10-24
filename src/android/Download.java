@@ -12,7 +12,6 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import android.support.annotation.NonNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.SpeedCalculator;
