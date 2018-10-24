@@ -56,29 +56,7 @@ public class Download extends CordovaPlugin {
 				private long totalLength;
 				private String readableTotalLength;
 
-				@Override public void taskStart(@NonNull DownloadTask task) {
-					//statusTv.setText(R.string.task_start);
-				}
-
-
-				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
-												   @NonNull Map<String, List<String>> requestHeaders) {
-					final String status = "Connect Start " + blockIndex;
-					//statusTv.setText(status);
-				}
-
-				@Override
-				public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode,
-									   @NonNull Map<String, List<String>> responseHeaders) {
-					final String status = "Connect End " + blockIndex;
-					//statusTv.setText(status);
-				}
-
-				@Override
-				public void progressBlock(@NonNull DownloadTask task, int blockIndex,
-										  long currentBlockOffset,
-										  @NonNull SpeedCalculator blockSpeed) {
-				}
+				
 
 				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
 											   @NonNull SpeedCalculator taskSpeed) {
@@ -91,29 +69,8 @@ public class Download extends CordovaPlugin {
 					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
 				}
 
-				@Override
-				public void blockEnd(@NonNull DownloadTask task, int blockIndex, BlockInfo info,
-									 @NonNull SpeedCalculator blockSpeed) {
-				}
-
-				@Override public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause,
-											  @Nullable Exception realCause,
-											  @NonNull SpeedCalculator taskSpeed) {
-					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
-					//statusTv.setText(statusWithSpeed);
-
-					//actionTv.setText(R.string.start);
-					// mark
-					// task.setTag(null);
-					// if (cause == EndCause.COMPLETED) {
-						// final String realMd5 = fileToMD5(task.getFile().getAbsolutePath());
-						// if (!realMd5.equalsIgnoreCase("f836a37a5eee5dec0611ce15a76e8fd5")) {
-							// Log.e(TAG, "file is wrong because of md5 is wrong " + realMd5);
-						// }
-					// }
-				}
 			});
-			
+			callbackContext1.success('ok');
 			/*
 			ThinDownloadManager downloadManager = new ThinDownloadManager(4);
 			
