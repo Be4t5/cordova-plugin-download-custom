@@ -12,7 +12,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import android.support.annotation.NonNull;
-import org.jetbrains.annotations.Nullable;
+//import org.jetbrains.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import com.liulishuo.okdownload.DownloadTask;
@@ -105,7 +105,7 @@ public class Download extends CordovaPlugin {
 				}
 
 				@Override public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause,
-											  @Nullable Exception realCause,
+											  Exception realCause,
 											  @NonNull SpeedCalculator taskSpeed) {
 					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
 					//statusTv.setText(statusWithSpeed);
