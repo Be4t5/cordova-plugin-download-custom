@@ -5,6 +5,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.util.List;
+import java.util.Map;
+import android.support.annotation.NonNull;
+
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.SpeedCalculator;
 import com.liulishuo.okdownload.StatusUtil;
