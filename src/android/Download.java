@@ -25,17 +25,17 @@ import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.liulishuo.okdownload.*;
-
+import android.util.Log;
 
 
 public class Download extends CordovaPlugin {
 	
-	CallbackContext callbackContext1;
+	
 	
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 	
-		callbackContext1 = callbackContext;
+		CallbackContext callbackContext;
 		
         if (action.equals("download")) {
 
@@ -53,6 +53,7 @@ public class Download extends CordovaPlugin {
                 .setPassIfAlreadyCompleted(false)
                 .build();
 				
+			callbackContext.success("ok");
 			
 			task.enqueue(new DownloadListener4WithSpeed() {
 				private long totalLength;
@@ -97,6 +98,8 @@ public class Download extends CordovaPlugin {
 					
 					//statusTv.setText(progressStatusWithSpeed);
 					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
+					Log.d("OKDOWNLOAD 4", "In progress");
+					Log.d("OKDOWNLOAD 4", taskSpeed.speed());
 				}
 
 				@Override
