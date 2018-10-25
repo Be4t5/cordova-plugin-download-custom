@@ -35,7 +35,6 @@ public class Download extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 	
-		CallbackContext callbackContext;
 		
         if (action.equals("download")) {
 
