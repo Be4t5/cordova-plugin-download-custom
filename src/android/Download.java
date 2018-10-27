@@ -29,12 +29,12 @@ import android.util.Log;
 
 
 public class Download extends CordovaPlugin {
-	
-	
+
+	CallbackContext callbackContext1;
 	
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
-	
+		callbackContext1 = callbackContext;
 		
         if (action.equals("download")) {
 
@@ -42,7 +42,7 @@ public class Download extends CordovaPlugin {
             String path = data.getString(1);
             String fileName = data.getString(2);
             String title = data.getString(3);
-			
+			File cache = cordova.getActivity().getExternalCacheDir();
 			final File parentFile = new File(path);
 			DownloadTask task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
@@ -51,8 +51,10 @@ public class Download extends CordovaPlugin {
                 // ignore the same task has already completed in the past.
                 .setPassIfAlreadyCompleted(false)
                 .build();
-				
-			callbackContext.success("ok");
+
+			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
+			pluginResult.setKeepCallback(true);
+			callbackContext.sendPluginResult(pluginResult);
 			
 			task.enqueue(new DownloadListener4WithSpeed() {
 				private long totalLength;
@@ -66,7 +68,8 @@ public class Download extends CordovaPlugin {
 				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
 									  boolean fromBreakpoint,
 									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
-
+					totalLength = info.getTotalLength();
+					readableTotalLength = Util.humanReadableBytes(totalLength, true);
 				}
 
 				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
@@ -90,13 +93,15 @@ public class Download extends CordovaPlugin {
 
 				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
 											   @NonNull SpeedCalculator taskSpeed) {
-					//final String readableOffset = Util.humanReadableBytes(currentOffset, true);
-					//final String progressStatus = readableOffset + "/" + readableTotalLength;
-					//final String speed = taskSpeed.speed();
-					//final String progressStatusWithSpeed = progressStatus + "(" + speed + ")";
-					
-					//statusTv.setText(progressStatusWithSpeed);
-					//DemoUtil.calcProgressToView(progressBar, currentOffset, totalLength);
+					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
+					final String progressStatus = readableOffset + "/" + readableTotalLength;
+					final String speed = taskSpeed.speed();
+					final float percent = ((float) currentOffset / totalLength) * 100;
+					final String progressStatusWithSpeed = "PROGRESS|"+progressStatus + "(" + speed + ")" + "|" + percent;
+					PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progressStatusWithSpeed);
+					pluginResult.setKeepCallback(true); // keep callback
+					callbackContext1.sendPluginResult(pluginResult);
+
 					Log.d("OKDOWNLOAD 4", "In progress");
 					Log.d("OKDOWNLOAD 4", taskSpeed.speed());
 				}
@@ -110,6 +115,7 @@ public class Download extends CordovaPlugin {
 											  Exception realCause,
 											  @NonNull SpeedCalculator taskSpeed) {
 					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
+					callbackContext1.success(statusWithSpeed);
 					//statusTv.setText(statusWithSpeed);
 
 					//actionTv.setText(R.string.start);
