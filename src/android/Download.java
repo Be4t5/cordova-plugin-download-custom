@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
+
+import android.content.Context;
 import android.support.annotation.NonNull;
 //import org.jetbrains.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -25,13 +27,20 @@ import com.liulishuo.okdownload.core.cause.EndCause;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.liulishuo.okdownload.*;
-import android.util.Log;
+import android.support.v4.app.NotificationCompat;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.R;
 
 
 public class Download extends CordovaPlugin {
 
 	CallbackContext callbackContext1;
-	
+	private NotificationCompat.Builder builder;
+	private NotificationManager manager;
+	Context context;
+	private NotificationCompat.Action action;
+
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 		callbackContext1 = callbackContext;
@@ -42,7 +51,6 @@ public class Download extends CordovaPlugin {
             String path = data.getString(1);
             String fileName = data.getString(2);
             String title = data.getString(3);
-			File cache = cordova.getActivity().getExternalCacheDir();
 			final File parentFile = new File(path);
 			DownloadTask task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
@@ -55,13 +63,20 @@ public class Download extends CordovaPlugin {
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
 			pluginResult.setKeepCallback(true);
 			callbackContext.sendPluginResult(pluginResult);
-			
+
+			initNotification(title);
+
 			task.enqueue(new DownloadListener4WithSpeed() {
 				private long totalLength;
 				private String readableTotalLength;
 
 				@Override public void taskStart(@NonNull DownloadTask task) {
-					//statusTv.setText(R.string.task_start);
+					builder.setTicker("taskStart");
+					builder.setOngoing(true);
+					builder.setAutoCancel(false);
+					builder.setContentText("The task is started");
+					builder.setProgress(0, 0, true);
+					manager.notify(task.getId(), builder.build());
 				}
 
 				@Override
@@ -70,19 +85,37 @@ public class Download extends CordovaPlugin {
 									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
 					totalLength = info.getTotalLength();
 					readableTotalLength = Util.humanReadableBytes(totalLength, true);
+
+					if (fromBreakpoint) {
+						builder.setTicker("fromBreakpoint");
+					} else {
+						builder.setTicker("fromBeginning");
+					}
+					builder.setContentText(
+							"This task is download fromBreakpoint[" + fromBreakpoint + "]");
+					builder.setProgress((int) info.getTotalLength(), (int) info.getTotalOffset(), true);
+					manager.notify(task.getId(), builder.build());
+
+					totalLength = (int) info.getTotalLength();
 				}
 
 				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
 												   @NonNull Map<String, List<String>> requestHeaders) {
-					final String status = "Connect Start " + blockIndex;
-					//statusTv.setText(status);
+					builder.setTicker("connectStart");
+					builder.setContentText(
+							"The connect of " + blockIndex + " block for this task is connecting");
+					builder.setProgress(0, 0, true);
+					manager.notify(task.getId(), builder.build());
 				}
 
 				@Override
 				public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode,
 									   @NonNull Map<String, List<String>> responseHeaders) {
-					final String status = "Connect End " + blockIndex;
-					//statusTv.setText(status);
+					builder.setTicker("connectStart");
+					builder.setContentText(
+							"The connect of " + blockIndex + " block for this task is connected");
+					builder.setProgress(0, 0, true);
+					manager.notify(task.getId(), builder.build());
 				}
 
 				@Override
@@ -93,7 +126,8 @@ public class Download extends CordovaPlugin {
 
 				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
 											   @NonNull SpeedCalculator taskSpeed) {
-					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
+					/*
+
 					final String progressStatus = readableOffset + "/" + readableTotalLength;
 					final String speed = taskSpeed.speed();
 					final float percent = ((float) currentOffset / totalLength) * 100;
@@ -104,6 +138,12 @@ public class Download extends CordovaPlugin {
 
 					Log.d("OKDOWNLOAD 4", "In progress");
 					Log.d("OKDOWNLOAD 4", taskSpeed.speed());
+					*/
+					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
+					final String progressStatus = readableOffset + "/" + readableTotalLength;
+					builder.setContentText(progressStatus + "(" + taskSpeed.speed() + ")");
+					builder.setProgress((int)totalLength, (int) currentOffset, false);
+					manager.notify(task.getId(), builder.build());
 				}
 
 				@Override
@@ -116,48 +156,21 @@ public class Download extends CordovaPlugin {
 											  @NonNull SpeedCalculator taskSpeed) {
 					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
 					callbackContext1.success(statusWithSpeed);
-					//statusTv.setText(statusWithSpeed);
+					builder.setOngoing(false);
+					builder.setAutoCancel(true);
 
-					//actionTv.setText(R.string.start);
-					// mark
-					// task.setTag(null);
-					// if (cause == EndCause.COMPLETED) {
-						// final String realMd5 = fileToMD5(task.getFile().getAbsolutePath());
-						// if (!realMd5.equalsIgnoreCase("f836a37a5eee5dec0611ce15a76e8fd5")) {
-							// Log.e(TAG, "file is wrong because of md5 is wrong " + realMd5);
-						// }
-					// }
+
+
+					builder.setTicker("taskEnd " + cause);
+					builder.setContentText("Download completato");
+					if (cause == EndCause.COMPLETED) {
+						builder.setSmallIcon(R.drawable.stat_sys_download_done);
+						builder.setProgress(0, 0, false);
+					}
+					manager.notify(task.getId(), builder.build());
 				}
 			});
-			
-			/*
-			ThinDownloadManager downloadManager = new ThinDownloadManager(4);
-			
-			Uri downloadUri = Uri.parse(url);
-		   Uri destinationUri = Uri.parse(path+fileName);
-		   DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-				   .setRetryPolicy(new DefaultRetryPolicy())
-				   .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
-				   .setDownloadListener(new DownloadStatusListener() {
-					   @Override
-					   public void onDownloadComplete(int id) {
-							callbackContext1.success("ok");
-					   }
 
-					   @Override
-					   public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-							callbackContext1.success("ok");
-					   }
-
-					   @Override
-					   public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress) {
-							callbackContext1.success(progress);
-					   }
-				   });
-			
-			downloadManager.add(downloadRequest);
-			
-			*/
 
             return true;
 
@@ -170,4 +183,28 @@ public class Download extends CordovaPlugin {
 		
 		
     }
+
+	public void initNotification(String title) {
+		context = cordova.getActivity().getApplicationContext();
+		manager = (NotificationManager)
+				context.getSystemService(context.NOTIFICATION_SERVICE);
+
+		builder = new NotificationCompat.Builder(context);
+
+
+		builder.setDefaults(Notification.DEFAULT_LIGHTS)
+				.setOngoing(true)
+				.setOnlyAlertOnce(true)
+				.setPriority(NotificationCompat.PRIORITY_HIGH)
+				.setContentTitle(title)
+				.setContentText("")
+				//.setSubText("prova prova prova")
+				//.addAction(R.drawable.ic_menu_delete, "Annulla", myIntentToButtonOneScreen)
+
+				.setSmallIcon(R.drawable.stat_sys_download);
+
+		if (action != null) {
+			builder.addAction(action);
+		}
+	}
 }
