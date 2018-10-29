@@ -25,7 +25,7 @@
 
     <source-file src="src/android/Download.java" target-dir="src/com/download/"/>
     <source-file src="src/android/libs/annotations-2.0.1.jar" target-dir="libs"/>
-    <source-file src="thindownloadmanager-1.0.1.jar" target-dir="libs"/>
+    <source-file src="src/android/libs/thindownloadmanager-1.0.1.jar" target-dir="libs"/>
 
 <!-- <framework src="com.liulishuo.okdownload:okhttp:1.0.4" /> -->
 <framework src="com.liulishuo.okdownload:okdownload:1.0.4" />
