@@ -163,7 +163,10 @@ public class Download extends CordovaPlugin {
 											  Exception realCause,
 											  @NonNull SpeedCalculator taskSpeed) {
 					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
-					callbackContext1.success(statusWithSpeed);
+					if(cause.toString() == "ERROR")
+						callbackContext1.success("ERROR " + realCause.toString());
+					else
+						callbackContext1.success(statusWithSpeed);
 					builder.setOngoing(false);
 					builder.setAutoCancel(true);
 
