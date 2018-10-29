@@ -75,29 +75,31 @@ public class Download extends CordovaPlugin {
 			Uri downloadUri = Uri.parse(url);
 			Uri destinationUri = Uri.parse(path+"/" +fileName);
 			DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-					.setRetryPolicy(new DefaultRetryPolicy())
+					.setRetryPolicy(new DefaultRetryPolicy(5000,10,1f))
 					.setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
 					.setDownloadListener(new DownloadStatusListener() {
 						@Override
 						public void onDownloadComplete(int id) {
-							callbackContext1.success("ok");
+							
 							builder.setContentText("Download completato");
 
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
 							manager.notify(id, builder.build());
+							callbackContext1.success("ok");
 						}
 
 						@Override
 						public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-							callbackContext1.success(errorMessage);
+							
 							builder.setContentText("Errore");
 
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
 							manager.notify(id, builder.build());
+							callbackContext1.success(errorMessage);
 						}
 
 						@Override
@@ -114,7 +116,7 @@ public class Download extends CordovaPlugin {
 							manager.notify(downloadId, builder.build());
 						}
 					});
-			downloadManager = new ThinDownloadManager();
+			downloadManager = new ThinDownloadManager(4);
 			downloadId = downloadManager.add(downloadRequest);
 			initNotification(title);
 
