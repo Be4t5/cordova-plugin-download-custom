@@ -12,7 +12,13 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 //import org.jetbrains.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,7 +45,9 @@ public class Download extends CordovaPlugin {
 	private NotificationCompat.Builder builder;
 	private NotificationManager manager;
 	Context context;
+	DownloadTask task;
 	private NotificationCompat.Action action;
+	ButtonReceiver buttonReceiver;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -52,12 +60,13 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			final File parentFile = new File(path);
-			DownloadTask task = new DownloadTask.Builder(url, parentFile)
+			task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
-                .setMinIntervalMillisCallbackProcess(16)
+                .setMinIntervalMillisCallbackProcess(80)
                 // ignore the same task has already completed in the past.
                 .setPassIfAlreadyCompleted(false)
+					.setAutoCallbackToUIThread(false)
                 .build();
 
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
@@ -74,7 +83,7 @@ public class Download extends CordovaPlugin {
 					builder.setTicker("taskStart");
 					builder.setOngoing(true);
 					builder.setAutoCancel(false);
-					builder.setContentText("The task is started");
+					builder.setContentText("Avvio download in corso...");
 					builder.setProgress(0, 0, true);
 					manager.notify(task.getId(), builder.build());
 				}
@@ -91,8 +100,7 @@ public class Download extends CordovaPlugin {
 					} else {
 						builder.setTicker("fromBeginning");
 					}
-					builder.setContentText(
-							"This task is download fromBreakpoint[" + fromBreakpoint + "]");
+					//builder.setContentText("This task is download fromBreakpoint[" + fromBreakpoint + "]");
 					builder.setProgress((int) info.getTotalLength(), (int) info.getTotalOffset(), true);
 					manager.notify(task.getId(), builder.build());
 
@@ -102,8 +110,7 @@ public class Download extends CordovaPlugin {
 				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
 												   @NonNull Map<String, List<String>> requestHeaders) {
 					builder.setTicker("connectStart");
-					builder.setContentText(
-							"The connect of " + blockIndex + " block for this task is connecting");
+					//builder.setContentText("The connect of " + blockIndex + " block for this task is connecting");
 					builder.setProgress(0, 0, true);
 					manager.notify(task.getId(), builder.build());
 				}
@@ -112,8 +119,7 @@ public class Download extends CordovaPlugin {
 				public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode,
 									   @NonNull Map<String, List<String>> responseHeaders) {
 					builder.setTicker("connectStart");
-					builder.setContentText(
-							"The connect of " + blockIndex + " block for this task is connected");
+					//builder.setContentText("The connect of " + blockIndex + " block for this task is connected");
 					builder.setProgress(0, 0, true);
 					manager.notify(task.getId(), builder.build());
 				}
@@ -138,7 +144,9 @@ public class Download extends CordovaPlugin {
 
 					Log.d("OKDOWNLOAD 4", "In progress");
 					Log.d("OKDOWNLOAD 4", taskSpeed.speed());
+
 					*/
+
 					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
 					final String progressStatus = readableOffset + "/" + readableTotalLength;
 					builder.setContentText(progressStatus + "(" + taskSpeed.speed() + ")");
@@ -159,7 +167,7 @@ public class Download extends CordovaPlugin {
 					builder.setOngoing(false);
 					builder.setAutoCancel(true);
 
-
+					//cordova.getActivity().unregisterReceiver(buttonReceiver);
 
 					builder.setTicker("taskEnd " + cause);
 					builder.setContentText("Download completato");
@@ -184,6 +192,11 @@ public class Download extends CordovaPlugin {
 		
     }
 
+	@Override public void onDestroy() {
+		super.onDestroy();
+		cordova.getActivity().unregisterReceiver(buttonReceiver);
+	}
+
 	public void initNotification(String title) {
 		context = cordova.getActivity().getApplicationContext();
 		manager = (NotificationManager)
@@ -192,6 +205,14 @@ public class Download extends CordovaPlugin {
 		builder = new NotificationCompat.Builder(context);
 
 
+		// for cancel action on notification.
+		IntentFilter filter = new IntentFilter(ButtonReceiver.ACTION);
+		buttonReceiver = new ButtonReceiver(task);
+		cordova.getActivity().registerReceiver(buttonReceiver, filter);
+
+		Intent intent=new Intent(ButtonReceiver.ACTION);
+		PendingIntent pendingIntent= PendingIntent.getBroadcast(cordova.getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		builder.setDefaults(Notification.DEFAULT_LIGHTS)
 				.setOngoing(true)
 				.setOnlyAlertOnce(true)
@@ -199,12 +220,31 @@ public class Download extends CordovaPlugin {
 				.setContentTitle(title)
 				.setContentText("")
 				//.setSubText("prova prova prova")
-				//.addAction(R.drawable.ic_menu_delete, "Annulla", myIntentToButtonOneScreen)
+				.addAction(R.drawable.ic_menu_delete, "Annulla", pendingIntent)
 
 				.setSmallIcon(R.drawable.stat_sys_download);
 
 		if (action != null) {
 			builder.addAction(action);
+		}
+	}
+	public static class ButtonReceiver extends BroadcastReceiver {
+
+		static final String ACTION = "cancelOkdownload";
+
+		private DownloadTask task;
+
+		ButtonReceiver(@NonNull DownloadTask task) {
+			this.task = task;
+		}
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			//int notificationId = intent.getIntExtra("notificationId", 0);
+			task.cancel();
+			// if you want cancel notification
+			NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			manager.cancel(task.getId());
 		}
 	}
 }
