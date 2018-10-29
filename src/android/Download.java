@@ -86,7 +86,7 @@ public class Download extends CordovaPlugin {
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
-							manager.notify(id, builder.build());
+							manager.notify(downloadId, builder.build());
 							callbackContext1.success("ok");
 						}
 
@@ -98,7 +98,7 @@ public class Download extends CordovaPlugin {
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
-							manager.notify(id, builder.build());
+							manager.notify(downloadId, builder.build());
 							callbackContext1.success(errorMessage);
 						}
 
