@@ -64,15 +64,13 @@ public class Download extends CordovaPlugin {
 			task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
-                .setMinIntervalMillisCallbackProcess(80)
+                .setMinIntervalMillisCallbackProcess(500)
                 // ignore the same task has already completed in the past.
                 .setPassIfAlreadyCompleted(false)
 					.setAutoCallbackToUIThread(false)
-					.setConnectionCount(1)
 
                 .build();
 
-			DownloadDispatcher.setMaxParallelRunningCount(1);
 
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
 			pluginResult.setKeepCallback(true);
