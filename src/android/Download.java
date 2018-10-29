@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import android.app.Activity;
@@ -51,6 +52,8 @@ public class Download extends CordovaPlugin {
 	DownloadTask task;
 	private NotificationCompat.Action action;
 	ButtonReceiver buttonReceiver;
+	int downloadId;
+	ThinDownloadManager downloadManager;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -78,11 +81,23 @@ public class Download extends CordovaPlugin {
 						@Override
 						public void onDownloadComplete(int id) {
 							callbackContext1.success("ok");
+							builder.setContentText("Download completato");
+
+							builder.setSmallIcon(R.drawable.stat_sys_download_done);
+							builder.setProgress(0, 0, false);
+
+							manager.notify(id, builder.build());
 						}
 
 						@Override
 						public void onDownloadFailed(int id, int errorCode, String errorMessage) {
 							callbackContext1.success(errorMessage);
+							builder.setContentText("Errore");
+
+							builder.setSmallIcon(R.drawable.stat_sys_download_done);
+							builder.setProgress(0, 0, false);
+
+							manager.notify(id, builder.build());
 						}
 
 						@Override
@@ -90,10 +105,26 @@ public class Download extends CordovaPlugin {
 							PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progress);
 							pluginResult.setKeepCallback(true); // keep callback
 							callbackContext1.sendPluginResult(pluginResult);
+
+							String downloaded = humanReadableBytes(downlaodedBytes, true);
+							String total = humanReadableBytes(totalBytes, true);
+
+							builder.setContentText(downloaded + "/" + total +"(" + progress + "%)");
+							builder.setProgress((int)totalBytes, (int) downlaodedBytes, false);
+							manager.notify(downloadId, builder.build());
 						}
 					});
-			ThinDownloadManager downloadManager = new ThinDownloadManager();
-			int downloadId = downloadManager.add(downloadRequest);
+			downloadManager = new ThinDownloadManager();
+			downloadId = downloadManager.add(downloadRequest);
+			initNotification(title);
+
+			builder.setTicker("taskStart");
+			builder.setOngoing(true);
+			builder.setAutoCancel(false);
+			builder.setContentText("Avvio download in corso...");
+			builder.setProgress(0, 0, true);
+			manager.notify(downloadId, builder.build());
+
 			/*
 			task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
@@ -225,9 +256,12 @@ public class Download extends CordovaPlugin {
 		
     }
 
-	@Override public void onDestroy() {
-		super.onDestroy();
-		cordova.getActivity().unregisterReceiver(buttonReceiver);
+	public static String humanReadableBytes(long bytes, boolean si) {
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit) return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		return String.format(Locale.ENGLISH, "%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
 	public void initNotification(String title) {
@@ -240,7 +274,7 @@ public class Download extends CordovaPlugin {
 
 		// for cancel action on notification.
 		IntentFilter filter = new IntentFilter(ButtonReceiver.ACTION);
-		buttonReceiver = new ButtonReceiver(task);
+		buttonReceiver = new ButtonReceiver(downloadManager,downloadId);
 		cordova.getActivity().registerReceiver(buttonReceiver, filter);
 
 		Intent intent=new Intent(ButtonReceiver.ACTION);
@@ -265,21 +299,23 @@ public class Download extends CordovaPlugin {
 
 		static final String ACTION = "cancelOkdownload";
 
-		private DownloadTask task;
+		private ThinDownloadManager downloadManager;
+		int downloadId;
 
-		ButtonReceiver(@NonNull DownloadTask task) {
-			this.task = task;
+		ButtonReceiver(@NonNull ThinDownloadManager downloadManager, int downloadId) {
+
+			this.downloadManager = downloadManager;
+			this.downloadId = downloadId;
 		}
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
 			//int notificationId = intent.getIntExtra("notificationId", 0);
-			task.cancel();
+
+			downloadManager.cancel(downloadId);
 			// if you want cancel notification
 			NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-			manager.cancel(task.getId());
-
-			OkDownload.with().breakpointStore().remove(task.getId());
+			manager.cancel(downloadId);
 		}
 	}
 }
