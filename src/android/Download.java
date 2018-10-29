@@ -69,6 +69,8 @@ public class Download extends CordovaPlugin {
 					.setAutoCallbackToUIThread(false)
                 .build();
 
+
+
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
 			pluginResult.setKeepCallback(true);
 			callbackContext.sendPluginResult(pluginResult);
@@ -95,11 +97,13 @@ public class Download extends CordovaPlugin {
 					totalLength = info.getTotalLength();
 					readableTotalLength = Util.humanReadableBytes(totalLength, true);
 
+
 					if (fromBreakpoint) {
 						builder.setTicker("fromBreakpoint");
 					} else {
 						builder.setTicker("fromBeginning");
 					}
+
 					//builder.setContentText("This task is download fromBreakpoint[" + fromBreakpoint + "]");
 					builder.setProgress((int) info.getTotalLength(), (int) info.getTotalOffset(), true);
 					manager.notify(task.getId(), builder.build());
@@ -170,7 +174,7 @@ public class Download extends CordovaPlugin {
 					builder.setOngoing(false);
 					builder.setAutoCancel(true);
 
-					//cordova.getActivity().unregisterReceiver(buttonReceiver);
+					OkDownload.with().breakpointStore().remove(task.getId());
 
 					builder.setTicker("taskEnd " + cause);
 					builder.setContentText("Download completato");
@@ -248,6 +252,8 @@ public class Download extends CordovaPlugin {
 			// if you want cancel notification
 			NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			manager.cancel(task.getId());
+
+			OkDownload.with().breakpointStore().remove(task.getId());
 		}
 	}
 }
