@@ -18,6 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 //import org.jetbrains.annotations.Nullable;
@@ -38,6 +39,7 @@ import android.support.v4.app.NotificationCompat;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.R;
+import com.thin.downloadmanager.*;
 
 
 public class Download extends CordovaPlugin {
@@ -61,16 +63,51 @@ public class Download extends CordovaPlugin {
             String fileName = data.getString(2);
             String title = data.getString(3);
 			final File parentFile = new File(path);
+
+
+			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
+			pluginResult.setKeepCallback(true);
+			callbackContext.sendPluginResult(pluginResult);
+
+			Uri downloadUri = Uri.parse(url);
+			Uri destinationUri = Uri.parse(path+"/" +fileName);
+			DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+					.setRetryPolicy(new DefaultRetryPolicy())
+					.setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
+					.setDownloadListener(new DownloadStatusListener() {
+						@Override
+						public void onDownloadComplete(int id) {
+							callbackContext1.success("ok");
+						}
+
+						@Override
+						public void onDownloadFailed(int id, int errorCode, String errorMessage) {
+							callbackContext1.success(errorMessage);
+						}
+
+						@Override
+						public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress) {
+							PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progress);
+							pluginResult.setKeepCallback(true); // keep callback
+							callbackContext1.sendPluginResult(pluginResult);
+						}
+					});
+			ThinDownloadManager downloadManager = new ThinDownloadManager();
+			int downloadId = downloadManager.add(downloadRequest);
+			/*
 			task = new DownloadTask.Builder(url, parentFile)
                 .setFilename(fileName)
                 // the minimal interval millisecond for callback progress
-                .setMinIntervalMillisCallbackProcess(500)
+                .setMinIntervalMillisCallbackProcess(80)
                 // ignore the same task has already completed in the past.
                 .setPassIfAlreadyCompleted(false)
 					.setAutoCallbackToUIThread(false)
 
+					.setConnectionCount(1)
+
                 .build();
 
+			DownloadDispatcher.setMaxParallelRunningCount(1);
 
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
 			pluginResult.setKeepCallback(true);
@@ -136,21 +173,9 @@ public class Download extends CordovaPlugin {
 				}
 
 				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
-											   @NonNull SpeedCalculator taskSpeed) {
-					/*
 
-					final String progressStatus = readableOffset + "/" + readableTotalLength;
-					final String speed = taskSpeed.speed();
-					final float percent = ((float) currentOffset / totalLength) * 100;
-					final String progressStatusWithSpeed = "PROGRESS|"+progressStatus + "(" + speed + ")" + "|" + percent;
-					PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progressStatusWithSpeed);
-					pluginResult.setKeepCallback(true); // keep callback
-					callbackContext1.sendPluginResult(pluginResult);
 
-					Log.d("OKDOWNLOAD 4", "In progress");
-					Log.d("OKDOWNLOAD 4", taskSpeed.speed());
 
-					*/
 
 					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
 					final String progressStatus = readableOffset + "/" + readableTotalLength;
@@ -187,7 +212,7 @@ public class Download extends CordovaPlugin {
 				}
 			});
 
-
+*/
             return true;
 
         } 
