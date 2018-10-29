@@ -30,6 +30,7 @@ import com.liulishuo.okdownload.core.Util;
 import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
 import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
 import com.liulishuo.okdownload.core.cause.EndCause;
+import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
 import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
 import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
 import com.liulishuo.okdownload.*;
@@ -67,9 +68,11 @@ public class Download extends CordovaPlugin {
                 // ignore the same task has already completed in the past.
                 .setPassIfAlreadyCompleted(false)
 					.setAutoCallbackToUIThread(false)
+					.setConnectionCount(1)
+
                 .build();
 
-
+			DownloadDispatcher.setMaxParallelRunningCount(1);
 
 			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
 			pluginResult.setKeepCallback(true);
