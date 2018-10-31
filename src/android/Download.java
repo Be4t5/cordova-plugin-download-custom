@@ -87,10 +87,10 @@ public class Download extends CordovaPlugin {
 
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
-
+							builder.mActions.clear();
 							manager.notify(id, builder.build());
 
-							builder.mActions.clear();
+							
 						}
 
 						@Override
