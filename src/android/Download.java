@@ -84,23 +84,26 @@ public class Download extends CordovaPlugin {
 						public void onDownloadComplete(int id) {
 							callbackContext1.success("ok");
 							builder.setContentText("Download completato");
-
+							builder.setStyle(new NotificationCompat.BigTextStyle().bigText(""));
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 							builder.mActions.clear();
+							builder.setAutoCancel(true);
+							builder.setOngoing(false);
 							manager.notify(id, builder.build());
 
-							
+
 						}
 
 						@Override
 						public void onDownloadFailed(int id, int errorCode, String errorMessage) {
 							callbackContext1.success(errorMessage);
 							builder.setContentText("Errore");
-
+							builder.setAutoCancel(true);
+							builder.setOngoing(false);
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
-
+							builder.setStyle(new NotificationCompat.BigTextStyle().bigText(""));
 							manager.notify(id, builder.build());
 						}
 
@@ -116,7 +119,8 @@ public class Download extends CordovaPlugin {
 								String downloaded = humanReadableBytes(downlaodedBytes, true);
 								String total = humanReadableBytes(totalBytes, true);
 
-								builder.setContentText(downloaded + "/" + total +"(" + progress + "%)");
+								builder.setContentText("Download in corso...");
+								builder.setStyle(new NotificationCompat.BigTextStyle().bigText(downloaded + "/" + total +" (" + progress + "%)"));
 								builder.setProgress((int)totalBytes, (int) downlaodedBytes, false);
 								manager.notify(downloadId, builder.build());
 							}
