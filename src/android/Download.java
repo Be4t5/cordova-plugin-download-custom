@@ -54,6 +54,8 @@ public class Download extends CordovaPlugin {
 	ButtonReceiver buttonReceiver;
 	int downloadId;
 	ThinDownloadManager downloadManager;
+	long taskStart;
+	long lastUpdate;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -75,49 +77,56 @@ public class Download extends CordovaPlugin {
 			Uri downloadUri = Uri.parse(url);
 			Uri destinationUri = Uri.parse(path+"/" +fileName);
 			DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-					.setRetryPolicy(new DefaultRetryPolicy(5000,10,1f))
+					.setRetryPolicy(new DefaultRetryPolicy())
 					.setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
 					.setDownloadListener(new DownloadStatusListener() {
 						@Override
 						public void onDownloadComplete(int id) {
-							
+							callbackContext1.success("ok");
 							builder.setContentText("Download completato");
 
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
-							manager.notify(downloadId, builder.build());
-							callbackContext1.success("ok");
+							manager.notify(id, builder.build());
+
+							builder.mActions.clear();
 						}
 
 						@Override
 						public void onDownloadFailed(int id, int errorCode, String errorMessage) {
-							
+							callbackContext1.success(errorMessage);
 							builder.setContentText("Errore");
 
 							builder.setSmallIcon(R.drawable.stat_sys_download_done);
 							builder.setProgress(0, 0, false);
 
-							manager.notify(downloadId, builder.build());
-							callbackContext1.success(errorMessage);
+							manager.notify(id, builder.build());
 						}
 
 						@Override
 						public void onProgress(int id, long totalBytes, long downlaodedBytes, int progress) {
-							PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progress);
-							pluginResult.setKeepCallback(true); // keep callback
-							callbackContext1.sendPluginResult(pluginResult);
 
-							String downloaded = humanReadableBytes(downlaodedBytes, true);
-							String total = humanReadableBytes(totalBytes, true);
+							if(System.currentTimeMillis() - lastUpdate > 1000){
+								lastUpdate = System.currentTimeMillis();
+								PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, progress);
+								pluginResult.setKeepCallback(true); // keep callback
+								callbackContext1.sendPluginResult(pluginResult);
 
-							builder.setContentText(downloaded + "/" + total +"(" + progress + "%)");
-							builder.setProgress((int)totalBytes, (int) downlaodedBytes, false);
-							manager.notify(downloadId, builder.build());
+								String downloaded = humanReadableBytes(downlaodedBytes, true);
+								String total = humanReadableBytes(totalBytes, true);
+
+								builder.setContentText(downloaded + "/" + total +"(" + progress + "%)");
+								builder.setProgress((int)totalBytes, (int) downlaodedBytes, false);
+								manager.notify(downloadId, builder.build());
+							}
+
 						}
 					});
-			downloadManager = new ThinDownloadManager(4);
+			downloadManager = new ThinDownloadManager();
 			downloadId = downloadManager.add(downloadRequest);
+			taskStart = System.currentTimeMillis();
+			lastUpdate = System.currentTimeMillis();
 			initNotification(title);
 
 			builder.setTicker("taskStart");
@@ -127,125 +136,7 @@ public class Download extends CordovaPlugin {
 			builder.setProgress(0, 0, true);
 			manager.notify(downloadId, builder.build());
 
-			/*
-			task = new DownloadTask.Builder(url, parentFile)
-                .setFilename(fileName)
-                // the minimal interval millisecond for callback progress
-                .setMinIntervalMillisCallbackProcess(80)
-                // ignore the same task has already completed in the past.
-                .setPassIfAlreadyCompleted(false)
-					.setAutoCallbackToUIThread(false)
 
-					.setConnectionCount(1)
-
-                .build();
-
-			DownloadDispatcher.setMaxParallelRunningCount(1);
-
-			PluginResult pluginResult = new  PluginResult(PluginResult.Status.NO_RESULT);
-			pluginResult.setKeepCallback(true);
-			callbackContext.sendPluginResult(pluginResult);
-
-			initNotification(title);
-
-			task.enqueue(new DownloadListener4WithSpeed() {
-				private long totalLength;
-				private String readableTotalLength;
-
-				@Override public void taskStart(@NonNull DownloadTask task) {
-					builder.setTicker("taskStart");
-					builder.setOngoing(true);
-					builder.setAutoCancel(false);
-					builder.setContentText("Avvio download in corso...");
-					builder.setProgress(0, 0, true);
-					manager.notify(task.getId(), builder.build());
-				}
-
-				@Override
-				public void infoReady(@NonNull DownloadTask task, @NonNull BreakpointInfo info,
-									  boolean fromBreakpoint,
-									  @NonNull Listener4SpeedAssistExtend.Listener4SpeedModel model) {
-					totalLength = info.getTotalLength();
-					readableTotalLength = Util.humanReadableBytes(totalLength, true);
-
-
-					if (fromBreakpoint) {
-						builder.setTicker("fromBreakpoint");
-					} else {
-						builder.setTicker("fromBeginning");
-					}
-
-					//builder.setContentText("This task is download fromBreakpoint[" + fromBreakpoint + "]");
-					builder.setProgress((int) info.getTotalLength(), (int) info.getTotalOffset(), true);
-					manager.notify(task.getId(), builder.build());
-
-					totalLength = (int) info.getTotalLength();
-				}
-
-				@Override public void connectStart(@NonNull DownloadTask task, int blockIndex,
-												   @NonNull Map<String, List<String>> requestHeaders) {
-					builder.setTicker("connectStart");
-					//builder.setContentText("The connect of " + blockIndex + " block for this task is connecting");
-					builder.setProgress(0, 0, true);
-					manager.notify(task.getId(), builder.build());
-				}
-
-				@Override
-				public void connectEnd(@NonNull DownloadTask task, int blockIndex, int responseCode,
-									   @NonNull Map<String, List<String>> responseHeaders) {
-					builder.setTicker("connectStart");
-					//builder.setContentText("The connect of " + blockIndex + " block for this task is connected");
-					builder.setProgress(0, 0, true);
-					manager.notify(task.getId(), builder.build());
-				}
-
-				@Override
-				public void progressBlock(@NonNull DownloadTask task, int blockIndex,
-										  long currentBlockOffset,
-										  @NonNull SpeedCalculator blockSpeed) {
-				}
-
-				@Override public void progress(@NonNull DownloadTask task, long currentOffset,
-
-
-
-
-					final String readableOffset = Util.humanReadableBytes(currentOffset, true);
-					final String progressStatus = readableOffset + "/" + readableTotalLength;
-					builder.setContentText(progressStatus + "(" + taskSpeed.speed() + ")");
-					builder.setProgress((int)totalLength, (int) currentOffset, false);
-					manager.notify(task.getId(), builder.build());
-				}
-
-				@Override
-				public void blockEnd(@NonNull DownloadTask task, int blockIndex, BlockInfo info,
-									 @NonNull SpeedCalculator blockSpeed) {
-				}
-
-				@Override public void taskEnd(@NonNull DownloadTask task, @NonNull EndCause cause,
-											  Exception realCause,
-											  @NonNull SpeedCalculator taskSpeed) {
-					final String statusWithSpeed = cause.toString() + " " + taskSpeed.averageSpeed();
-					if(cause.toString() == "ERROR")
-						callbackContext1.success("ERROR " + realCause.toString());
-					else
-						callbackContext1.success(statusWithSpeed);
-					builder.setOngoing(false);
-					builder.setAutoCancel(true);
-
-					OkDownload.with().breakpointStore().remove(task.getId());
-
-					builder.setTicker("taskEnd " + cause);
-					builder.setContentText("Download completato");
-					if (cause == EndCause.COMPLETED) {
-						builder.setSmallIcon(R.drawable.stat_sys_download_done);
-						builder.setProgress(0, 0, false);
-					}
-					manager.notify(task.getId(), builder.build());
-				}
-			});
-
-*/
             return true;
 
         } 
