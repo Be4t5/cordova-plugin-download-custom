@@ -35,16 +35,16 @@ public class Download extends CordovaPlugin {
 	long taskStart;
 	long lastUpdate;
 
-    @Override
-    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
+	@Override
+	public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 		callbackContext1 = callbackContext;
-		
-        if (action.equals("download")) {
 
-            String url = data.getString(0);
-            String path = data.getString(1);
-            String fileName = data.getString(2);
-            String title = data.getString(3);
+		if (action.equals("download")) {
+
+			String url = data.getString(0);
+			String path = data.getString(1);
+			String fileName = data.getString(2);
+			String title = data.getString(3);
 			final File parentFile = new File(path);
 
 
@@ -119,17 +119,56 @@ public class Download extends CordovaPlugin {
 			manager.notify(downloadId, builder.build());
 
 
-            return true;
+			return true;
 
-        } 
+		}else if(action.equals("downloadWithADM")){
+			String url = data.getString(0);
+			String path = data.getString(1);
+			String fileName = data.getString(2);
+			String title = data.getString(3);
+			Intent intent = new Intent ("android.intent.action.MAIN");
+			intent.setClassName ("com.dv.adm", "com.dv.adm.AEditor");// for the PRO version of “com.dv.adm.pay”, for DVGet “com.dv.get” and “com.dv.get.pro”
+			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url);
+			intent.putExtra ("com.android.extra.filename", fileName);
+			intent.putExtra ("com.dv.get.ACTION_LIST_PATH", path);
+
+			try {
+				cordova.getActivity().startActivity(intent);
+				callbackContext1.success("ok");
+			} catch (Exception e) {
+				callbackContext1.success("not found");
+			}
+
+			return true;
+		} else if(action.equals("downloadWithADMPro")){
+
+			String url = data.getString(0);
+			String path = data.getString(1);
+			String fileName = data.getString(2);
+			String title = data.getString(3);
+			Intent intent = new Intent ("android.intent.action.MAIN");
+			intent.setClassName ("com.dv.adm.pay", "com.dv.adm.pay.AEditor");// for the PRO version of “com.dv.adm.pay”, for DVGet “com.dv.get” and “com.dv.get.pro”
+			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url);
+			intent.putExtra ("com.android.extra.filename", fileName);
+			intent.putExtra ("com.dv.get.ACTION_LIST_PATH", path);
+			try {
+				cordova.getActivity().startActivity(intent);
+				callbackContext1.success("ok");
+			} catch (Exception e) {
+				callbackContext1.success("not found");
+			}
+
+
+			return true;
+		}
 		else {
-            
-            return false;
 
-        }
-		
-		
-    }
+			return false;
+
+		}
+
+
+	}
 
 	public static String humanReadableBytes(long bytes, boolean si) {
 		int unit = si ? 1000 : 1024;
