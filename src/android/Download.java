@@ -21,9 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-//import org.jetbrains.annotations.Nullable;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 import com.liulishuo.okdownload.DownloadTask;
 import com.liulishuo.okdownload.SpeedCalculator;
