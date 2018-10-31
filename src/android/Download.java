@@ -128,8 +128,7 @@ public class Download extends CordovaPlugin {
 			String title = data.getString(3);
 			Intent intent = new Intent ("android.intent.action.MAIN");
 			intent.setClassName ("com.dv.adm", "com.dv.adm.AEditor");// for the PRO version of “com.dv.adm.pay”, for DVGet “com.dv.get” and “com.dv.get.pro”
-			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url);
-			intent.putExtra ("com.android.extra.filename", fileName);
+			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url + "<info>" + fileName);
 			intent.putExtra ("com.dv.get.ACTION_LIST_PATH", path);
 
 			try {
@@ -148,8 +147,7 @@ public class Download extends CordovaPlugin {
 			String title = data.getString(3);
 			Intent intent = new Intent ("android.intent.action.MAIN");
 			intent.setClassName ("com.dv.adm.pay", "com.dv.adm.pay.AEditor");// for the PRO version of “com.dv.adm.pay”, for DVGet “com.dv.get” and “com.dv.get.pro”
-			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url);
-			intent.putExtra ("com.android.extra.filename", fileName);
+			intent.putExtra ("com.dv.get.ACTION_LIST_ADD", url + "<info>" + fileName);
 			intent.putExtra ("com.dv.get.ACTION_LIST_PATH", path);
 			try {
 				cordova.getActivity().startActivity(intent);
