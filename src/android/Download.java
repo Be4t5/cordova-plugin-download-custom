@@ -183,7 +183,7 @@ public class Download extends CordovaPlugin {
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
 				.setContentTitle(title)
 				.setContentText("")
-				//.setSubText("prova prova prova")
+				.setSubText("Download manager")
 				.addAction(R.drawable.ic_menu_delete, "Annulla", pendingIntent)
 
 				.setSmallIcon(R.drawable.stat_sys_download);
