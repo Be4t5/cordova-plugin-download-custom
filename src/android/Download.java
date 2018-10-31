@@ -4,36 +4,17 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Bundle;
+
+import android.support.annotation.NonNull;
 
 
-import com.liulishuo.okdownload.DownloadTask;
-import com.liulishuo.okdownload.SpeedCalculator;
-import com.liulishuo.okdownload.StatusUtil;
-import com.liulishuo.okdownload.core.Util;
-import com.liulishuo.okdownload.core.breakpoint.BlockInfo;
-import com.liulishuo.okdownload.core.breakpoint.BreakpointInfo;
-import com.liulishuo.okdownload.core.cause.EndCause;
-import com.liulishuo.okdownload.core.dispatcher.DownloadDispatcher;
-import com.liulishuo.okdownload.core.listener.DownloadListener4WithSpeed;
-import com.liulishuo.okdownload.core.listener.assist.Listener4SpeedAssistExtend;
-import com.liulishuo.okdownload.*;
 import android.support.v4.app.NotificationCompat;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -47,7 +28,6 @@ public class Download extends CordovaPlugin {
 	private NotificationCompat.Builder builder;
 	private NotificationManager manager;
 	Context context;
-	DownloadTask task;
 	private NotificationCompat.Action action;
 	ButtonReceiver buttonReceiver;
 	int downloadId;
@@ -181,7 +161,7 @@ public class Download extends CordovaPlugin {
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
 				.setContentTitle(title)
 				.setContentText("")
-				.setSubText("Download manager")
+				//.setSubText("prova prova prova")
 				.addAction(R.drawable.ic_menu_delete, "Annulla", pendingIntent)
 
 				.setSmallIcon(R.drawable.stat_sys_download);
