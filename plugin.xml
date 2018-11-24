@@ -29,8 +29,8 @@
 <!-- <framework src="com.liulishuo.okdownload:okdownload:1.0.4" /> -->
 <!-- <framework src="com.liulishuo.okdownload:sqlite:1.0.4" /> -->
 <!-- <framework src="com.squareup.okhttp3:okhttp:3.10.0" /> -->
-<!-- <framework src="com.android.support:support-annotations:+" /> -->
-<!-- <framework src="com.android.support:support-v4:24.1.1" /> -->
+<framework src="com.android.support:support-annotations:+" /> 
+<framework src="com.android.support:support-v4:24.1.1" />
 
 
   </platform>
