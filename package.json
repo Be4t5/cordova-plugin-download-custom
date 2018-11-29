@@ -1,9 +1,9 @@
 {
-  "name": "cordova-plugin-hello",
+  "name": "com.download",
   "version": "0.1.0",
   "description": "A sample for a new cordova plugin",
   "cordova": {
-    "id": "cordova-plugin-hello",
+    "id": "com.download",
     "platforms": [
       "android",
       "ios",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/don/cordova-plugin-hello.git"
+    "url": "git+https://github.com/Be4t5/cordova-plugin-download-custom.git"
   },
   "keywords": [
     "cordova",
