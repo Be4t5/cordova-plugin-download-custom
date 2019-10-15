@@ -139,7 +139,7 @@ public class Download extends CordovaPlugin {
 				cordova.getActivity().startActivity(intent);
 				callbackContext1.success("ok");
 			} catch (Exception e) {
-				callbackContext1.success("not found");
+				callbackContext1.error("not found");
 			}
 
 			return true;
@@ -157,7 +157,7 @@ public class Download extends CordovaPlugin {
 				cordova.getActivity().startActivity(intent);
 				callbackContext1.success("ok");
 			} catch (Exception e) {
-				callbackContext1.success("not found");
+				callbackContext1.error("not found");
 			}
 
 
