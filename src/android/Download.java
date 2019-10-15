@@ -5,6 +5,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.io.File;
 import java.util.Locale;
+
+import android.app.NotificationChannel;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,13 +14,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.R;
+import android.os.Build;
+
 import com.thin.downloadmanager.*;
 
 
@@ -181,8 +185,16 @@ public class Download extends CordovaPlugin {
 		manager = (NotificationManager)
 				context.getSystemService(context.NOTIFICATION_SERVICE);
 
-		builder = new NotificationCompat.Builder(context);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      /* Create or update. */
+      NotificationChannel channel = new NotificationChannel("veeziedownload",
+        "Channel human readable title",
+        NotificationManager.IMPORTANCE_DEFAULT);
 
+      manager.createNotificationChannel(channel);
+    }
+
+    builder = new NotificationCompat.Builder(context, "veeziedownload");
 
 		// for cancel action on notification.
 		IntentFilter filter = new IntentFilter(ButtonReceiver.ACTION);
@@ -198,7 +210,7 @@ public class Download extends CordovaPlugin {
 				.setPriority(NotificationCompat.PRIORITY_HIGH)
 				.setContentTitle(title)
 				.setContentText("")
-				//.setSubText("prova prova prova")
+      .setChannelId("veeziedownload")
 				.addAction(R.drawable.ic_menu_delete, "Annulla", pendingIntent)
 
 				.setSmallIcon(R.drawable.stat_sys_download);
