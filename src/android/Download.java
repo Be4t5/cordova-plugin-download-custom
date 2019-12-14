@@ -8,10 +8,13 @@ import java.util.Locale;
 
 import android.app.NotificationChannel;
 import android.app.PendingIntent;
+import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
@@ -24,6 +27,8 @@ import android.R;
 import android.os.Build;
 
 import com.thin.downloadmanager.*;
+
+import static android.content.Context.UI_MODE_SERVICE;
 
 
 public class Download extends CordovaPlugin {
@@ -162,7 +167,44 @@ public class Download extends CordovaPlugin {
 
 
 			return true;
-		}
+		}  else if(action.equals("downloadWithLJ")){
+
+      String url = data.getString(0);
+      String path = data.getString(1);
+      String fileName = data.getString(2);
+      String title = data.getString(3);
+      PackageManager manager = cordova.getActivity().getPackageManager();
+      Intent downloadIntent = manager.getLaunchIntentForPackage("com.leavjenn.m3u8downloader"); // Lj video downloader package name
+      if (downloadIntent == null) {
+        // Lj video downloader is not installed, maybe notify the user?
+        callbackContext1.error("not found");
+      }
+      downloadIntent.setDataAndType(Uri.parse(url), "video/hls"); // the video url
+
+      try {
+        cordova.getActivity().startActivity(downloadIntent);
+        callbackContext1.success("ok");
+      } catch (Exception e) {
+        callbackContext1.error("not found");
+      }
+
+
+      return true;
+    }else if (action.equals("isAndroidTv")){
+
+        cordova.getActivity().runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            UiModeManager uiModeManager = (UiModeManager) cordova.getActivity().getApplicationContext().getSystemService(UI_MODE_SERVICE);
+            if (uiModeManager.getCurrentModeType() == Configuration.UI_MODE_TYPE_TELEVISION) {
+              callbackContext1.success("true");
+            } else {
+              callbackContext1.success("false");
+            }
+          }
+        });
+        return true;
+    }
 		else {
 
 			return false;
