@@ -9,5 +9,8 @@ module.exports = {
     },
 	downloadWithADMPro: function (url, path, fileName, title, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "Download", "downloadWithADMPro", [url, path, fileName,title]);
-    }
+    },
+	downloadWithLJ: function (url, path, fileName, title, successCallback, errorCallback) {
+         cordova.exec(successCallback, errorCallback, "Download", "downloadWithLJ", [url, path, fileName,title]);
+     }
 };
